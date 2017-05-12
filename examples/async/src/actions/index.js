@@ -1,5 +1,6 @@
 export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
+export const FAIL_POSTS = 'FAIL_POSTS'
 export const SELECT_REDDIT = 'SELECT_REDDIT'
 export const INVALIDATE_REDDIT = 'INVALIDATE_REDDIT'
 
@@ -25,11 +26,17 @@ export const receivePosts = (reddit, json) => ({
   receivedAt: Date.now()
 })
 
+export const failPosts = error => ({
+  type: FAIL_POSTS,
+  error
+})
+
 const fetchPosts = reddit => dispatch => {
   dispatch(requestPosts(reddit))
   return fetch(`https://www.reddit.com/r/${reddit}.json`)
     .then(response => response.json())
     .then(json => dispatch(receivePosts(reddit, json)))
+    .catch(error => dispatch(failPosts(error)))
 }
 
 const shouldFetchPosts = (state, reddit) => {
